@@ -1,0 +1,32 @@
+{
+  "name": "projetoaula1",
+  "version": "1.0.0",
+  "description": "API Node.js desenvolvida nas aulas de Desenvolvimento Web - Back End",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "start:watch": "concurrently \"npx tsc -w\" \"node --watch ./dist/index.js\"",
+    "migration:create:situations": "typeorm migration:create src/migration/CreateSituationsTable",
+    "migration:create:users": "typeorm migration:create src/migration/CreateUsersTable",
+    "migration:run": "npm run build && typeorm migration:run -d ./dist/data-source.js",
+    "migration:revert": "npm run build && typeorm migration:revert -d ./dist/data-source.js"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "16.5.0",
+    "express": "5.1.0",
+    "mysql2": "3.14.1",
+    "reflect-metadata": "0.2.2",
+    "typeorm": "0.3.22"
+  },
+  "devDependencies": {
+    "@types/dotenv": "8.2.3",
+    "@types/express": "5.0.1",
+    "@types/node": "22.15.3",
+    "concurrently": "9.1.2",
+    "ts-node": "10.9.2",
+    "ts-node-dev": "2.0.0",
+    "typescript": "5.8.3"
+  }
+}

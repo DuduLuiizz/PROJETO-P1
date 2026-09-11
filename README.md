@@ -1,12 +1,13 @@
-# API Node.js - Projeto das aulas
+# API Node.js - CRUD de Situações
 
-Projeto reproduzido a partir das três aulas do Prof. Adriano Baião: configuração da API Node.js e migrations (partes 1 e 2).
+Projeto desenvolvido nas aulas de Desenvolvimento Web - Back End. A API possui o CRUD de situações com Node.js, Express, TypeORM e MySQL.
 
 ## Requisitos
 
 - Node.js 22 ou superior
 - npm
 - MySQL Server 8.x na porta 3306
+- Postman (opcional, para testar as rotas)
 
 ## Instalação
 
@@ -16,13 +17,13 @@ npm install
 
 ## Configuração do banco
 
-Crie a base usada nas aulas:
+Crie a base utilizada nas aulas:
 
 ```sql
 CREATE DATABASE nodeapi CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-Copie `.env.example` para `.env` e informe usuário e senha do MySQL. Os valores esperados são:
+Copie `.env.example` para `.env` e informe as credenciais do MySQL:
 
 ```env
 DB_DIALECT="mysql"
@@ -36,13 +37,11 @@ PORT=8080
 
 ## Migrations
 
-Execute as migrations:
+Para executar as migrations:
 
 ```bash
 npm run migration:run
 ```
-
-Esse script compila o TypeScript e executa o comando mostrado na aula, `npx typeorm migration:run -d ./dist/data-source.js`.
 
 Para desfazer a última migration:
 
@@ -59,10 +58,18 @@ npm run build
 npm start
 ```
 
-Durante o desenvolvimento, também é possível usar:
+Durante o desenvolvimento:
 
 ```bash
 npm run start:watch
 ```
 
-A rota criada nas aulas estará em `http://localhost:8080/`.
+A API ficará disponível em `http://localhost:8080`.
+
+## Rotas de situações
+
+- `POST /situations` - cadastrar
+- `GET /situations` - listar
+- `GET /situations/:id` - visualizar
+- `PUT /situations/:id` - atualizar
+- `DELETE /situations/:id` - excluir

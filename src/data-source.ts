@@ -6,6 +6,10 @@ import { DataSource } from "typeorm";
 import dotenv from "dotenv";
 dotenv.config();
 
+// Importar as entidades
+import { User } from "./entity/Users";
+import { Situation } from "./entity/Situations";
+
 const dialect = process.env.DB_DIALECT ?? "mysql";
 
 export const AppDataSource = new DataSource({
@@ -17,7 +21,7 @@ export const AppDataSource = new DataSource({
     database: process.env.DB_DATABASE,
     synchronize: false,
     logging: true,
-    entities: [__dirname + "/entity/*.{js,ts}"],
+    entities: [User, Situation],
     migrations: [__dirname + "/migration/*.{js,ts}"],
     subscribers: [],
 });

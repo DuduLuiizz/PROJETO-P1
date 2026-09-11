@@ -6,8 +6,8 @@ export class Situation {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column()
-    name!: string;
+    @Column({ unique: true })
+    nameSituation!: string;
 
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
     createdAt!: Date;

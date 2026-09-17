@@ -49,6 +49,12 @@ Para desfazer a última migration:
 npm run migration:revert
 ```
 
+Executar as seeds para cadastrar registro de teste nas tabelas no banco de dados.
+
+```bash
+node dist/run-seeds.js
+```
+
 ## Execução
 
 Compile e inicie a API:

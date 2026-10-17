@@ -1,0 +1,74 @@
+{
+  "info": {
+    "name": "API NodeJS - Projeto P1",
+    "description": "Testes dos CRUDs e da paginação do projeto.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test(\"Status HTTP esperado\", function () {",
+          "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 404]);",
+          "});"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Situations",
+      "item": [
+        { "name": "CREATE", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["if (pm.response.code === 201) {", "    pm.environment.set(\"situationId\", pm.response.json().situation.id);", "}"] } }], "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nameSituation\": \"Em análise\"\n}" }, "url": "{{baseUrl}}/situations" } },
+        { "name": "LIST", "request": { "method": "GET", "url": "{{baseUrl}}/situations?page=1&limit=10" } },
+        { "name": "VIEW", "request": { "method": "GET", "url": "{{baseUrl}}/situations/{{situationId}}" } },
+        { "name": "EDIT", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nameSituation\": \"Em análise atualizada\"\n}" }, "url": "{{baseUrl}}/situations/{{situationId}}" } },
+        { "name": "DELETE", "request": { "method": "DELETE", "url": "{{baseUrl}}/situations/{{situationId}}" } }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        { "name": "CREATE", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["if (pm.response.code === 201) {", "    pm.environment.set(\"userId\", pm.response.json().user.id);", "}"] } }], "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Novo Usuário\",\n  \"email\": \"novo@teste.com\",\n  \"situationId\": {{userSituationId}}\n}" }, "url": "{{baseUrl}}/users" } },
+        { "name": "LIST", "request": { "method": "GET", "url": "{{baseUrl}}/users?page=1&limit=10" } },
+        { "name": "VIEW", "request": { "method": "GET", "url": "{{baseUrl}}/users/{{userId}}" } },
+        { "name": "EDIT", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Usuário Atualizado\",\n  \"email\": \"atualizado@teste.com\",\n  \"situationId\": {{userSituationId}}\n}" }, "url": "{{baseUrl}}/users/{{userId}}" } },
+        { "name": "DELETE", "request": { "method": "DELETE", "url": "{{baseUrl}}/users/{{userId}}" } },
+        { "name": "NOT FOUND", "request": { "method": "GET", "url": "{{baseUrl}}/users/999999" } }
+      ]
+    },
+    {
+      "name": "Product Categories",
+      "item": [
+        { "name": "CREATE", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["if (pm.response.code === 201) {", "    pm.environment.set(\"productCategoryId\", pm.response.json().productCategory.id);", "}"] } }], "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Acessórios\"\n}" }, "url": "{{baseUrl}}/product-categories" } },
+        { "name": "LIST", "request": { "method": "GET", "url": "{{baseUrl}}/product-categories?page=1&limit=10" } },
+        { "name": "VIEW", "request": { "method": "GET", "url": "{{baseUrl}}/product-categories/{{productCategoryId}}" } },
+        { "name": "EDIT", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Acessórios atualizados\"\n}" }, "url": "{{baseUrl}}/product-categories/{{productCategoryId}}" } },
+        { "name": "DELETE", "request": { "method": "DELETE", "url": "{{baseUrl}}/product-categories/{{productCategoryId}}" } }
+      ]
+    },
+    {
+      "name": "Product Situations",
+      "item": [
+        { "name": "CREATE", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["if (pm.response.code === 201) {", "    pm.environment.set(\"productSituationId\", pm.response.json().productSituation.id);", "}"] } }], "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Em manutenção\"\n}" }, "url": "{{baseUrl}}/product-situations" } },
+        { "name": "LIST", "request": { "method": "GET", "url": "{{baseUrl}}/product-situations?page=1&limit=10" } },
+        { "name": "VIEW", "request": { "method": "GET", "url": "{{baseUrl}}/product-situations/{{productSituationId}}" } },
+        { "name": "EDIT", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Em manutenção atualizada\"\n}" }, "url": "{{baseUrl}}/product-situations/{{productSituationId}}" } },
+        { "name": "DELETE", "request": { "method": "DELETE", "url": "{{baseUrl}}/product-situations/{{productSituationId}}" } }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        { "name": "CREATE", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["if (pm.response.code === 201) {", "    pm.environment.set(\"productId\", pm.response.json().product.id);", "}"] } }], "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Monitor\",\n  \"productSituationId\": {{seedProductSituationId}},\n  \"productCategoryId\": {{seedProductCategoryId}}\n}" }, "url": "{{baseUrl}}/products" } },
+        { "name": "LIST", "request": { "method": "GET", "url": "{{baseUrl}}/products?page=1&limit=10" } },
+        { "name": "VIEW", "request": { "method": "GET", "url": "{{baseUrl}}/products/{{productId}}" } },
+        { "name": "EDIT", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Monitor atualizado\",\n  \"productSituationId\": {{seedProductSituationId}},\n  \"productCategoryId\": {{seedProductCategoryId}}\n}" }, "url": "{{baseUrl}}/products/{{productId}}" } },
+        { "name": "DELETE", "request": { "method": "DELETE", "url": "{{baseUrl}}/products/{{productId}}" } },
+        { "name": "NOT FOUND", "request": { "method": "GET", "url": "{{baseUrl}}/products/999999" } }
+      ]
+    }
+  ]
+}

@@ -10,6 +10,10 @@ const app = express();
 // Incluir as Controllers
 import AuthController from "./controllers/AuthController";
 import SituationsController from "./controllers/SituationsController";
+import UsersController from "./controllers/UsersController";
+import ProductCategoriesController from "./controllers/ProductCategoriesController";
+import ProductSituationsController from "./controllers/ProductSituationsController";
+import ProductsController from "./controllers/ProductsController";
 
 // Inicializar a conexao com BD
 AppDataSource.initialize().then(() => {
@@ -24,6 +28,10 @@ app.use(express.json());
 // Criar as rotas
 app.use("/", AuthController);
 app.use("/", SituationsController);
+app.use("/", UsersController);
+app.use("/", ProductCategoriesController);
+app.use("/", ProductSituationsController);
+app.use("/", ProductsController);
 
 // Iniciar o servidor na porta definida
 const port = Number(process.env.PORT) || 8080;

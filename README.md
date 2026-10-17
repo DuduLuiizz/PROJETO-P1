@@ -1,10 +1,11 @@
-# API Node.js - CRUD de Situações
+# API Node.js - Projeto P1
 
-Projeto desenvolvido nas aulas de Desenvolvimento Web - Back End. A API possui o CRUD de situações com Node.js, Express, TypeORM e MySQL.
+API desenvolvida nas aulas de Desenvolvimento Web - Back End com Node.js, Express, TypeORM e MySQL. O projeto possui CRUDs de situações, usuários, categorias de produtos, situações de produtos e produtos.
 
 ## Requisitos
 
 - Node.js 22 ou superior
+- `@types/node` 22.15.2
 - npm
 - MySQL Server 8.x na porta 3306
 - Postman (opcional, para testar as rotas)
@@ -72,6 +73,8 @@ npm run start:watch
 
 A API ficará disponível em `http://localhost:8080`.
 
+As listagens aceitam paginação com `?page=1&limit=10`.
+
 ## Rotas de situações
 
 - `POST /situations` - cadastrar
@@ -79,3 +82,18 @@ A API ficará disponível em `http://localhost:8080`.
 - `GET /situations/:id` - visualizar
 - `PUT /situations/:id` - atualizar
 - `DELETE /situations/:id` - excluir
+
+## Outras rotas
+
+Os recursos abaixo possuem rotas POST, GET, GET por ID, PUT e DELETE:
+
+- `/users`
+- `/product-categories`
+- `/product-situations`
+- `/products`
+
+Usuários são relacionados a situações. Produtos são relacionados a uma categoria e a uma situação de produto.
+
+## Postman
+
+Os arquivos para importação estão no diretório `postman`. Importe a coleção e o environment, selecione o ambiente **API NodeJS - Local** e execute as requisições organizadas por recurso.

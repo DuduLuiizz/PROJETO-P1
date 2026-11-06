@@ -11,7 +11,10 @@
         "type": "text/javascript",
         "exec": [
           "pm.test(\"Status HTTP esperado\", function () {",
-          "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 404]);",
+          "    const name = pm.info.requestName;",
+          "    const invalidNames = [\"VALIDAÇÃO OBRIGATÓRIO\", \"VALIDAÇÃO MÍNIMO\", \"CREATE DUPLICADO\", \"EDIT DUPLICADO\"];",
+          "    const expected = invalidNames.includes(name) ? 400 : name === \"NOT FOUND\" ? 404 : name === \"CREATE\" ? 201 : 200;",
+          "    pm.expect(pm.response.code).to.equal(expected);",
           "});"
         ]
       }
@@ -22,10 +25,20 @@
       "name": "Situations",
       "item": [
         { "name": "CREATE", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["if (pm.response.code === 201) {", "    pm.environment.set(\"situationId\", pm.response.json().situation.id);", "}"] } }], "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nameSituation\": \"Em análise\"\n}" }, "url": "{{baseUrl}}/situations" } },
+        { "name": "VALIDAÇÃO OBRIGATÓRIO", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"Nome obrigatório retorna 400\", () => pm.response.to.have.status(400));"] } }], "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nameSituation\": \"\"\n}" }, "url": "{{baseUrl}}/situations" } },
+        { "name": "VALIDAÇÃO MÍNIMO", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"Nome curto retorna 400\", () => pm.response.to.have.status(400));"] } }], "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nameSituation\": \"At\"\n}" }, "url": "{{baseUrl}}/situations" } },
+        { "name": "CREATE DUPLICADO", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"Nome duplicado retorna 400\", () => pm.response.to.have.status(400));"] } }], "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nameSituation\": \"Ativo\"\n}" }, "url": "{{baseUrl}}/situations" } },
         { "name": "LIST", "request": { "method": "GET", "url": "{{baseUrl}}/situations?page=1&limit=10" } },
         { "name": "VIEW", "request": { "method": "GET", "url": "{{baseUrl}}/situations/{{situationId}}" } },
         { "name": "EDIT", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nameSituation\": \"Em análise atualizada\"\n}" }, "url": "{{baseUrl}}/situations/{{situationId}}" } },
+        { "name": "EDIT DUPLICADO", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"Edição com nome duplicado retorna 400\", () => pm.response.to.have.status(400));"] } }], "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nameSituation\": \"Ativo\"\n}" }, "url": "{{baseUrl}}/situations/{{situationId}}" } },
         { "name": "DELETE", "request": { "method": "DELETE", "url": "{{baseUrl}}/situations/{{situationId}}" } }
+      ]
+    },
+    {
+      "name": "Rota Genérica",
+      "item": [
+        { "name": "Teste API", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"Conexão com a API\", () => pm.response.to.have.status(200));"] } }], "request": { "method": "GET", "url": "{{baseUrl}}/test-connection" } }
       ]
     },
     {

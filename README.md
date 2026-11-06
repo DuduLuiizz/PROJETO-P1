@@ -16,6 +16,19 @@ API desenvolvida nas aulas de Desenvolvimento Web - Back End com Node.js, Expres
 npm install
 ```
 
+Validação de formulário:
+
+```bash
+npm i yup
+```
+
+Permitir requisição externa:
+
+```bash
+npm i cors
+npm install --save-dev @types/cors
+```
+
 ## Configuração do banco
 
 Crie a base utilizada nas aulas:

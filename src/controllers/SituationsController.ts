@@ -1,5 +1,7 @@
 // Importar a biblioteca Express
 import express, { Request, Response } from "express";
+import { Not } from "typeorm";
+import * as yup from "yup";
 
 // Importar o arquivo com as credenciais do banco de dados
 import { AppDataSource } from "../data-source";
@@ -69,7 +71,26 @@ router.post("/situations", async (req: Request, res: Response) => {
     try {
         const data = req.body;
 
+        const schema = yup.object().shape({
+            nameSituation: yup.string()
+                .required("O campo nome é obrigatório!")
+                .min(3, "O campo nome deve ter no mínimo 3 caracteres!"),
+        });
+
+        await schema.validate(data, { abortEarly: false });
+
         const situationRepository = AppDataSource.getRepository(Situation);
+
+        const existingSituation = await situationRepository.findOne({
+            where: { nameSituation: data.nameSituation },
+        });
+
+        if (existingSituation) {
+            res.status(400).json({
+                message: "Já existe uma situação cadastrada com esse nome!",
+            });
+            return;
+        }
 
         const newSituation = situationRepository.create(data);
 
@@ -80,6 +101,11 @@ router.post("/situations", async (req: Request, res: Response) => {
             situation: newSituation,
         });
     } catch (error) {
+        if (error instanceof yup.ValidationError) {
+            res.status(400).json({ message: error.errors });
+            return;
+        }
+
         res.status(500).json({
             message: "Erro ao cadastrar situação!",
         });
@@ -92,6 +118,14 @@ router.put("/situations/:id", async (req: Request, res: Response) => {
         const { id } = req.params;
         const data = req.body;
 
+        const schema = yup.object().shape({
+            nameSituation: yup.string()
+                .required("O campo nome é obrigatório!")
+                .min(3, "O campo nome deve ter no mínimo 3 caracteres!"),
+        });
+
+        await schema.validate(data, { abortEarly: false });
+
         const situationRepository = AppDataSource.getRepository(Situation);
 
         const situation = await situationRepository.findOneBy({ id: parseInt(id as string) });
@@ -99,6 +133,20 @@ router.put("/situations/:id", async (req: Request, res: Response) => {
         if (!situation) {
             res.status(404).json({
                 message: "Situação não encontrada!",
+            });
+            return;
+        }
+
+        const existingSituation = await situationRepository.findOne({
+            where: {
+                nameSituation: data.nameSituation,
+                id: Not(parseInt(id as string)),
+            },
+        });
+
+        if (existingSituation) {
+            res.status(400).json({
+                message: "Já existe uma situação cadastrada com esse nome!",
             });
             return;
         }
@@ -115,6 +163,11 @@ router.put("/situations/:id", async (req: Request, res: Response) => {
         });
         return;
     } catch (error) {
+        if (error instanceof yup.ValidationError) {
+            res.status(400).json({ message: error.errors });
+            return;
+        }
+
         res.status(500).json({
             message: "Erro ao listar situação!",
         });

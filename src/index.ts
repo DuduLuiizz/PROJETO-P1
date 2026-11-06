@@ -1,5 +1,6 @@
 // Importar a biblioteca Express
 import express from "express";
+import cors from "cors";
 
 // Importar o arquivo com as credenciais do banco de dados
 import { AppDataSource } from "./data-source";
@@ -9,6 +10,7 @@ const app = express();
 
 // Incluir as Controllers
 import AuthController from "./controllers/AuthController";
+import TestConnectionController from "./controllers/TestConnectionController";
 import SituationsController from "./controllers/SituationsController";
 import UsersController from "./controllers/UsersController";
 import ProductCategoriesController from "./controllers/ProductCategoriesController";
@@ -25,7 +27,11 @@ AppDataSource.initialize().then(() => {
 // Permitir receber os dados no formato de objeto no corpo da requisicao
 app.use(express.json());
 
+// Permitir requisicao externa
+app.use(cors());
+
 // Criar as rotas
+app.use("/", TestConnectionController);
 app.use("/", AuthController);
 app.use("/", SituationsController);
 app.use("/", UsersController);

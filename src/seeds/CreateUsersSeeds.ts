@@ -14,7 +14,11 @@ export default class CreateUsersSeeds {
         if (!situation) {
             throw new Error("Situação 'Ativo' não encontrada para cadastrar o usuário.");
         }
-        await repository.save(repository.create({ name: "Usuário Teste", email: "usuario@teste.com", situation }));
+        const users = repository.create([
+            { id: 1, name: "Adriano Baião", email: "baiao@baiao.com.br", password: "123456", situation },
+            { id: 2, name: "Aurora", email: "aurora@baiao.com.br", password: "123456", situation },
+        ]);
+        await repository.save(users);
         console.log("Seed concluído com sucesso: usuários cadastrados!");
     }
 }

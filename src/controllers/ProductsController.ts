@@ -4,6 +4,9 @@ import { Product } from "../entity/Products";
 import { ProductCategory } from "../entity/ProductCategories";
 import { ProductSituation } from "../entity/ProductSituations";
 import { PaginationService } from "../services/PaginationService";
+import { Not } from "typeorm";
+import * as yup from "yup";
+import slugify from "slugify";
 
 const router = express.Router();
 
@@ -40,6 +43,11 @@ router.get("/products/:id", async (req: Request, res: Response) => {
 router.post("/products", async (req: Request, res: Response) => {
     try {
         const { name, productSituationId, productCategoryId } = req.body;
+        const schema = yup.object().shape({
+            name: yup.string().required("O campo nome é obrigatório!").min(3, "O campo nome deve ter no mínimo 3 caracteres!").max(255, "O campo nome deve ter no máximo 255 caracteres!"),
+        });
+        await schema.validate(req.body, { abortEarly: false });
+        const slug = slugify(req.body.slug || name, { lower: true, strict: true });
         const productSituation = await AppDataSource.getRepository(ProductSituation).findOneBy({ id: Number(productSituationId) });
         if (!productSituation) {
             res.status(404).json({ message: "Situação de produto não encontrada!" });
@@ -51,10 +59,19 @@ router.post("/products", async (req: Request, res: Response) => {
             return;
         }
         const repository = AppDataSource.getRepository(Product);
-        const newProduct = repository.create({ name, productSituation, productCategory });
+        const existingProduct = await repository.findOne({ where: { slug } });
+        if (existingProduct) {
+            res.status(400).json({ message: "Já existe um produto cadastrado com esse slug!" });
+            return;
+        }
+        const newProduct = repository.create({ name, slug, productSituation, productCategory });
         await repository.save(newProduct);
         res.status(201).json({ message: "Produto cadastrado com sucesso!", product: newProduct });
     } catch (error) {
+        if (error instanceof yup.ValidationError) {
+            res.status(400).json({ message: error.errors });
+            return;
+        }
         res.status(500).json({ message: "Erro ao cadastrar produto!" });
     }
 });
@@ -68,7 +85,17 @@ router.put("/products/:id", async (req: Request, res: Response) => {
             return;
         }
         const { name, productSituationId, productCategoryId } = req.body;
-        repository.merge(product, { name });
+        const schema = yup.object().shape({
+            name: yup.string().required("O campo nome é obrigatório!").min(3, "O campo nome deve ter no mínimo 3 caracteres!").max(255, "O campo nome deve ter no máximo 255 caracteres!"),
+        });
+        await schema.validate(req.body, { abortEarly: false });
+        const slug = slugify(req.body.slug || name, { lower: true, strict: true });
+        const existingProduct = await repository.findOne({ where: { slug, id: Not(product.id) } });
+        if (existingProduct) {
+            res.status(400).json({ message: "Já existe um produto cadastrado com esse slug!" });
+            return;
+        }
+        repository.merge(product, { name, slug });
         if (productSituationId) {
             const situation = await AppDataSource.getRepository(ProductSituation).findOneBy({ id: Number(productSituationId) });
             if (!situation) {
@@ -89,6 +116,10 @@ router.put("/products/:id", async (req: Request, res: Response) => {
         res.status(200).json({ message: "Produto atualizado com sucesso!", product: updateProduct });
         return;
     } catch (error) {
+        if (error instanceof yup.ValidationError) {
+            res.status(400).json({ message: error.errors });
+            return;
+        }
         res.status(500).json({ message: "Erro ao atualizar produto!" });
         return;
     }

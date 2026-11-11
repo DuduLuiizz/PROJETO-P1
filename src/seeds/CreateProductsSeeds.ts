@@ -21,8 +21,8 @@ export default class CreateProductsSeeds {
             throw new Error("Categorias ou situações necessárias para cadastrar os produtos não foram encontradas.");
         }
         await repository.save([
-            repository.create({ name: "Notebook", productCategory: computerCategory, productSituation: available }),
-            repository.create({ name: "Cadeira", productCategory: officeCategory, productSituation: unavailable }),
+            repository.create({ name: "Notebook", slug: "notebook", productCategory: computerCategory, productSituation: available }),
+            repository.create({ name: "Cadeira", slug: "cadeira", productCategory: officeCategory, productSituation: unavailable }),
         ]);
         console.log("Seed concluído com sucesso: produtos cadastrados!");
     }

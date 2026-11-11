@@ -29,6 +29,12 @@ npm i cors
 npm install --save-dev @types/cors
 ```
 
+Gerar o slug dos produtos:
+
+```bash
+npm install slugify
+```
+
 ## Configuração do banco
 
 Crie a base utilizada nas aulas:
@@ -50,6 +56,13 @@ PORT=8080
 ```
 
 ## Migrations
+
+Criar as migrations de alteração das tabelas, como na Aula 15:
+
+```bash
+npx typeorm migration:create src/migration/AddSlugToProducts
+npx typeorm migration:create src/migration/AddPasswordToUsers
+```
 
 Para executar as migrations:
 
@@ -106,6 +119,7 @@ Os recursos abaixo possuem rotas POST, GET, GET por ID, PUT e DELETE:
 - `/products`
 
 Usuários são relacionados a situações. Produtos são relacionados a uma categoria e a uma situação de produto.
+O cadastro de usuários exige senha com pelo menos seis caracteres. O slug dos produtos é único.
 
 ## Postman
 

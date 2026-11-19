@@ -35,6 +35,15 @@ Gerar o slug dos produtos:
 npm install slugify
 ```
 
+Criptografar senhas e gerar token no login, conforme as Aulas 16 e 17:
+
+```bash
+npm install --save bcryptjs
+npm install --save-dev @types/bcryptjs
+npm install jsonwebtoken
+npm i --save-dev @types/jsonwebtoken
+```
+
 ## Configuração do banco
 
 Crie a base utilizada nas aulas:
@@ -53,6 +62,7 @@ DB_DATABASE="nodeapi"
 DB_USERNAME="root"
 DB_PASSWORD="sua_senha"
 PORT=8080
+JWT_SECRET="sua_chave_secreta"
 ```
 
 ## Migrations
@@ -120,6 +130,8 @@ Os recursos abaixo possuem rotas POST, GET, GET por ID, PUT e DELETE:
 
 Usuários são relacionados a situações. Produtos são relacionados a uma categoria e a uma situação de produto.
 O cadastro de usuários exige senha com pelo menos seis caracteres. O slug dos produtos é único.
+
+Na Aula 16, as senhas de novos usuários e dos dois usuários criados pelo seed são salvas com bcrypt. Para alterar apenas a senha, use `PUT /users-password/:id` com `{"password":"123456"}`. A Aula 17 adiciona `POST /` com e-mail e senha; a resposta contém os dados do usuário e um token JWT válido por sete dias.
 
 ## Postman
 

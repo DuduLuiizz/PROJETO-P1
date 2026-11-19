@@ -12,8 +12,8 @@
         "exec": [
           "pm.test(\"Status HTTP esperado\", function () {",
           "    const name = pm.info.requestName;",
-          "    const invalidNames = [\"VALIDAÇÃO OBRIGATÓRIO\", \"VALIDAÇÃO MÍNIMO\", \"VALIDAÇÃO NOME\", \"VALIDAÇÃO EMAIL\", \"CREATE DUPLICADO\", \"EDIT DUPLICADO\"];",
-          "    const expected = invalidNames.includes(name) ? 400 : name === \"NOT FOUND\" ? 404 : name === \"CREATE\" ? 201 : 200;",
+          "    const invalidNames = [\"VALIDAÇÃO OBRIGATÓRIO\", \"VALIDAÇÃO MÍNIMO\", \"VALIDAÇÃO NOME\", \"VALIDAÇÃO EMAIL\", \"CREATE DUPLICADO\", \"EDIT DUPLICADO\", \"SEM SENHA\"];",
+          "    const expected = invalidNames.includes(name) ? 400 : name === \"CREDENCIAIS INVÁLIDAS\" ? 401 : name === \"NOT FOUND\" ? 404 : name === \"CREATE\" ? 201 : 200;",
           "    pm.expect(pm.response.code).to.equal(expected);",
           "});"
         ]
@@ -54,8 +54,18 @@
         { "name": "VIEW", "request": { "method": "GET", "url": "{{baseUrl}}/users/{{userId}}" } },
         { "name": "EDIT", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Usuário Atualizado\",\n  \"email\": \"atualizado@teste.com\",\n  \"situationId\": {{userSituationId}}\n}" }, "url": "{{baseUrl}}/users/{{userId}}" } },
         { "name": "EDIT DUPLICADO", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Usuário Atualizado\",\n  \"email\": \"baiao@baiao.com.br\",\n  \"situation\": {{userSituationId}}\n}" }, "url": "{{baseUrl}}/users/{{userId}}" } },
+        { "name": "EDIT PASSWORD", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"password\": \"123456\"\n}" }, "url": "{{baseUrl}}/users-password/{{userId}}" } },
+        { "name": "VALIDAÇÃO MÍNIMO", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"password\": \"12345\"\n}" }, "url": "{{baseUrl}}/users-password/{{userId}}" } },
         { "name": "DELETE", "request": { "method": "DELETE", "url": "{{baseUrl}}/users/{{userId}}" } },
         { "name": "NOT FOUND", "request": { "method": "GET", "url": "{{baseUrl}}/users/999999" } }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        { "name": "LOGIN", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"email\": \"baiao@baiao.com.br\",\n  \"password\": \"123456\"\n}" }, "url": "{{baseUrl}}/" } },
+        { "name": "SEM SENHA", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"email\": \"baiao@baiao.com.br\"\n}" }, "url": "{{baseUrl}}/" } },
+        { "name": "CREDENCIAIS INVÁLIDAS", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"email\": \"baiao@baiao.com.br\",\n  \"password\": \"senha-errada\"\n}" }, "url": "{{baseUrl}}/" } }
       ]
     },
     {

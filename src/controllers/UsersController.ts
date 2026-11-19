@@ -5,6 +5,7 @@ import { Situation } from "../entity/Situations";
 import { PaginationService } from "../services/PaginationService";
 import { Not } from "typeorm";
 import * as yup from "yup";
+import bcrypt from "bcryptjs";
 
 const router = express.Router();
 
@@ -62,6 +63,7 @@ router.post("/users", async (req: Request, res: Response) => {
             res.status(400).json({ message: "Já existe um usuário cadastrado com esse e-mail!" });
             return;
         }
+        data.password = await bcrypt.hash(data.password, 10);
         const newUser = userRepository.create({ name: data.name, email: data.email, password: data.password, situation });
         await userRepository.save(newUser);
         res.status(201).json({ message: "Usuário cadastrado com sucesso!", user: newUser });
@@ -71,6 +73,34 @@ router.post("/users", async (req: Request, res: Response) => {
             return;
         }
         res.status(500).json({ message: "Erro ao cadastrar usuário!" });
+    }
+});
+
+router.put("/users-password/:id", async (req: Request, res: Response) => {
+    try {
+        const data = req.body;
+        const schema = yup.object().shape({
+            password: yup.string().required("O campo senha é obrigatório!").min(6, "A senha deve ter no mínimo 6 caracteres!"),
+        });
+        await schema.validate(data, { abortEarly: false });
+
+        const userRepository = AppDataSource.getRepository(User);
+        const user = await userRepository.findOneBy({ id: parseInt(req.params.id as string) });
+        if (!user) {
+            res.status(404).json({ message: "Usuário não encontrado!" });
+            return;
+        }
+
+        data.password = await bcrypt.hash(data.password, 10);
+        userRepository.merge(user, data);
+        const updateUser = await userRepository.save(user);
+        res.status(200).json({ message: "Senha do usuário atualizado com sucesso!", user: updateUser });
+    } catch (error) {
+        if (error instanceof yup.ValidationError) {
+            res.status(400).json({ message: error.errors });
+            return;
+        }
+        res.status(500).json({ message: "Erro ao editar a senha do usuário!" });
     }
 });
 

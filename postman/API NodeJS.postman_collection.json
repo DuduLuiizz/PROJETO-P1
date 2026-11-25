@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "API NodeJS - Projeto P1",
-    "description": "Testes dos CRUDs e da paginação do projeto.",
+    "description": "Testes dos CRUDs, da paginação, da autenticação e da recuperação de senha do projeto.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "event": [
@@ -13,7 +13,9 @@
           "pm.test(\"Status HTTP esperado\", function () {",
           "    const name = pm.info.requestName;",
           "    const invalidNames = [\"VALIDAÇÃO OBRIGATÓRIO\", \"VALIDAÇÃO MÍNIMO\", \"VALIDAÇÃO NOME\", \"VALIDAÇÃO EMAIL\", \"CREATE DUPLICADO\", \"EDIT DUPLICADO\", \"SEM SENHA\"];",
-          "    const expected = invalidNames.includes(name) ? 400 : name === \"CREDENCIAIS INVÁLIDAS\" ? 401 : name === \"NOT FOUND\" ? 404 : name === \"CREATE\" ? 201 : 200;",
+          "    const unauthorizedNames = [\"CREDENCIAIS INVÁLIDAS\", \"LIST SEM TOKEN\", \"LIST TOKEN INVÁLIDO\"];",
+          "    const notFoundNames = [\"NOT FOUND\", \"VALIDATE CHAVE INVÁLIDA\", \"UPDATE CHAVE INVÁLIDA\"];",
+          "    const expected = invalidNames.includes(name) ? 400 : unauthorizedNames.includes(name) ? 401 : notFoundNames.includes(name) ? 404 : name === \"CREATE\" ? 201 : 200;",
           "    pm.expect(pm.response.code).to.equal(expected);",
           "});"
         ]
@@ -50,22 +52,29 @@
         { "name": "VALIDAÇÃO NOME", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Ab\",\n  \"email\": \"outro@teste.com\",\n  \"password\": \"123456\",\n  \"situation\": {{userSituationId}}\n}" }, "url": "{{baseUrl}}/users" } },
         { "name": "VALIDAÇÃO EMAIL", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Novo Usuário\",\n  \"email\": \"email-invalido\",\n  \"password\": \"123456\",\n  \"situation\": {{userSituationId}}\n}" }, "url": "{{baseUrl}}/users" } },
         { "name": "CREATE DUPLICADO", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Outro Usuário\",\n  \"email\": \"baiao@baiao.com.br\",\n  \"password\": \"123456\",\n  \"situation\": {{userSituationId}}\n}" }, "url": "{{baseUrl}}/users" } },
-        { "name": "LIST", "request": { "method": "GET", "url": "{{baseUrl}}/users?page=1&limit=10" } },
+        { "name": "LIST", "request": { "method": "GET", "url": "{{baseUrl}}/users?page=1&limit=10", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] } } },
         { "name": "VIEW", "request": { "method": "GET", "url": "{{baseUrl}}/users/{{userId}}" } },
         { "name": "EDIT", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Usuário Atualizado\",\n  \"email\": \"atualizado@teste.com\",\n  \"situationId\": {{userSituationId}}\n}" }, "url": "{{baseUrl}}/users/{{userId}}" } },
         { "name": "EDIT DUPLICADO", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Usuário Atualizado\",\n  \"email\": \"baiao@baiao.com.br\",\n  \"situation\": {{userSituationId}}\n}" }, "url": "{{baseUrl}}/users/{{userId}}" } },
-        { "name": "EDIT PASSWORD", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"password\": \"123456\"\n}" }, "url": "{{baseUrl}}/users-password/{{userId}}" } },
-        { "name": "VALIDAÇÃO MÍNIMO", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"password\": \"12345\"\n}" }, "url": "{{baseUrl}}/users-password/{{userId}}" } },
+        { "name": "EDIT PASSWORD", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"password\": \"123456\"\n}" }, "url": "{{baseUrl}}/users-password/{{userId}}", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] } } },
+        { "name": "VALIDAÇÃO MÍNIMO", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"password\": \"12345\"\n}" }, "url": "{{baseUrl}}/users-password/{{userId}}", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] } } },
         { "name": "DELETE", "request": { "method": "DELETE", "url": "{{baseUrl}}/users/{{userId}}" } },
-        { "name": "NOT FOUND", "request": { "method": "GET", "url": "{{baseUrl}}/users/999999" } }
+        { "name": "NOT FOUND", "request": { "method": "GET", "url": "{{baseUrl}}/users/999999" } },
+        { "name": "LIST SEM TOKEN", "request": { "method": "GET", "url": "{{baseUrl}}/users?page=1&limit=10" } },
+        { "name": "LIST TOKEN INVÁLIDO", "request": { "method": "GET", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "token-invalido", "type": "string" }] }, "url": "{{baseUrl}}/users?page=1&limit=10" } }
       ]
     },
     {
       "name": "Auth",
       "item": [
-        { "name": "LOGIN", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"email\": \"baiao@baiao.com.br\",\n  \"password\": \"123456\"\n}" }, "url": "{{baseUrl}}/" } },
+        { "name": "LOGIN", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"email\": \"baiao@baiao.com.br\",\n  \"password\": \"123456\"\n}" }, "url": "{{baseUrl}}/" }, "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["if (pm.response.code === 200) {", "    pm.environment.set(\"token\", pm.response.json().user.token);", "}"] } }] },
         { "name": "SEM SENHA", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"email\": \"baiao@baiao.com.br\"\n}" }, "url": "{{baseUrl}}/" } },
-        { "name": "CREDENCIAIS INVÁLIDAS", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"email\": \"baiao@baiao.com.br\",\n  \"password\": \"senha-errada\"\n}" }, "url": "{{baseUrl}}/" } }
+        { "name": "CREDENCIAIS INVÁLIDAS", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"email\": \"baiao@baiao.com.br\",\n  \"password\": \"senha-errada\"\n}" }, "url": "{{baseUrl}}/" } },
+        { "name": "RECOVER PASSWORD", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["if (pm.response.code === 200 && pm.response.json().urlRecoverPassword) {", "    pm.environment.set(\"recoverPassword\", pm.response.json().urlRecoverPassword.split(\"key=\")[1]);", "}"] } }], "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"urlRecoverPassword\": \"http://localhost:3000/recover-password\",\n  \"email\": \"baiao@baiao.com.br\"\n}" }, "url": "{{baseUrl}}/recover-password" } },
+        { "name": "VALIDATE RECOVER PASSWORD", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"email\": \"baiao@baiao.com.br\",\n  \"recoverPassword\": \"{{recoverPassword}}\"\n}" }, "url": "{{baseUrl}}/validate-recover-password" } },
+        { "name": "VALIDATE CHAVE INVÁLIDA", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"email\": \"baiao@baiao.com.br\",\n  \"recoverPassword\": \"chave-invalida\"\n}" }, "url": "{{baseUrl}}/validate-recover-password" } },
+        { "name": "UPDATE PASSWORD", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"email\": \"baiao@baiao.com.br\",\n  \"recoverPassword\": \"{{recoverPassword}}\",\n  \"password\": \"123456\"\n}" }, "url": "{{baseUrl}}/update-password" } },
+        { "name": "UPDATE CHAVE INVÁLIDA", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"email\": \"baiao@baiao.com.br\",\n  \"recoverPassword\": \"chave-invalida\",\n  \"password\": \"123456\"\n}" }, "url": "{{baseUrl}}/update-password" } }
       ]
     },
     {

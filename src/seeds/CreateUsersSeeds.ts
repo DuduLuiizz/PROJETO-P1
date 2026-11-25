@@ -1,7 +1,6 @@
 import { DataSource } from "typeorm";
 import { User } from "../entity/Users";
 import { Situation } from "../entity/Situations";
-import bcrypt from "bcryptjs";
 
 export default class CreateUsersSeeds {
     public async run(dataSource: DataSource): Promise<void> {
@@ -16,8 +15,8 @@ export default class CreateUsersSeeds {
             throw new Error("Situação 'Ativo' não encontrada para cadastrar o usuário.");
         }
         const users = repository.create([
-            { id: 1, name: "Adriano Baião", email: "baiao@baiao.com.br", password: await bcrypt.hash("123456", 10), situation },
-            { id: 2, name: "Aurora", email: "aurora@baiao.com.br", password: await bcrypt.hash("123456", 10), situation },
+            { id: 1, name: "Adriano Baião", email: "baiao@baiao.com.br", password: "123456", situation },
+            { id: 2, name: "Aurora", email: "aurora@baiao.com.br", password: "123456", situation },
         ]);
         await repository.save(users);
         console.log("Seed concluído com sucesso: usuários cadastrados!");

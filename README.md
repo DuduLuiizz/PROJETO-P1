@@ -44,6 +44,13 @@ npm install jsonwebtoken
 npm i --save-dev @types/jsonwebtoken
 ```
 
+Enviar a mensagem de recuperação de senha, conforme a Aula 20:
+
+```bash
+npm install nodemailer
+npm install --save-dev @types/nodemailer
+```
+
 ## Configuração do banco
 
 Crie a base utilizada nas aulas:
@@ -63,7 +70,16 @@ DB_USERNAME="root"
 DB_PASSWORD="sua_senha"
 PORT=8080
 JWT_SECRET="sua_chave_secreta"
+APP="Nome da aplicação"
+EMAIL_ADM="administrador@exemplo.com"
+EMAIL_FROM="suporte@exemplo.com"
+EMAIL_HOST="sandbox.smtp.mailtrap.io"
+EMAIL_PORT=2525
+EMAIL_USER="usuario_do_smtp"
+EMAIL_PASS="senha_do_smtp"
 ```
+
+Para testar o envio como na Aula 20, crie uma caixa de testes no Mailtrap e use as credenciais SMTP dessa caixa apenas no `.env` local. Sem uma caixa configurada, a rota informa que o e-mail não foi enviado.
 
 ## Migrations
 
@@ -132,6 +148,14 @@ Usuários são relacionados a situações. Produtos são relacionados a uma cate
 O cadastro de usuários exige senha com pelo menos seis caracteres. O slug dos produtos é único.
 
 Na Aula 16, as senhas de novos usuários e dos dois usuários criados pelo seed são salvas com bcrypt. Para alterar apenas a senha, use `PUT /users-password/:id` com `{"password":"123456"}`. A Aula 17 adiciona `POST /` com e-mail e senha; a resposta contém os dados do usuário e um token JWT válido por sete dias.
+
+Nas Aulas 18 a 21, `GET /users` e `PUT /users-password/:id` exigem o cabeçalho `Authorization: Bearer <token>`. A recuperação de senha usa:
+
+- `POST /recover-password` com `{"urlRecoverPassword":"http://localhost:3000/recover-password","email":"baiao@baiao.com.br"}` para gerar a chave e enviar o e-mail;
+- `POST /validate-recover-password` com `email` e `recoverPassword` para conferir a chave;
+- `PUT /update-password` com `email`, `recoverPassword` e `password` para trocar a senha e invalidar a chave.
+
+Execute `npm run migration:run` antes de usar a recuperação de senha. A migration adiciona a coluna `recoverPassword` à tabela `users` sem apagar os registros atuais.
 
 ## Postman
 

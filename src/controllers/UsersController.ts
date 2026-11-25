@@ -5,11 +5,11 @@ import { Situation } from "../entity/Situations";
 import { PaginationService } from "../services/PaginationService";
 import { Not } from "typeorm";
 import * as yup from "yup";
-import bcrypt from "bcryptjs";
+import { verifyToken } from "../middlewares/authMiddleware";
 
 const router = express.Router();
 
-router.get("/users", async (req: Request, res: Response) => {
+router.get("/users", verifyToken, async (req: Request, res: Response) => {
     try {
         const userRepository = AppDataSource.getRepository(User);
         const page = Number(req.query.page) || 1;
@@ -63,7 +63,6 @@ router.post("/users", async (req: Request, res: Response) => {
             res.status(400).json({ message: "Já existe um usuário cadastrado com esse e-mail!" });
             return;
         }
-        data.password = await bcrypt.hash(data.password, 10);
         const newUser = userRepository.create({ name: data.name, email: data.email, password: data.password, situation });
         await userRepository.save(newUser);
         res.status(201).json({ message: "Usuário cadastrado com sucesso!", user: newUser });
@@ -76,7 +75,7 @@ router.post("/users", async (req: Request, res: Response) => {
     }
 });
 
-router.put("/users-password/:id", async (req: Request, res: Response) => {
+router.put("/users-password/:id", verifyToken, async (req: Request, res: Response) => {
     try {
         const data = req.body;
         const schema = yup.object().shape({
@@ -91,7 +90,6 @@ router.put("/users-password/:id", async (req: Request, res: Response) => {
             return;
         }
 
-        data.password = await bcrypt.hash(data.password, 10);
         userRepository.merge(user, data);
         const updateUser = await userRepository.save(user);
         res.status(200).json({ message: "Senha do usuário atualizado com sucesso!", user: updateUser });

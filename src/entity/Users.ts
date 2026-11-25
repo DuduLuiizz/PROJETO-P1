@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, BeforeInsert, BeforeUpdate } from "typeorm";
 import { Situation } from "./Situations";
 import bcrypt from "bcryptjs";
 
@@ -16,6 +16,9 @@ export class User {
     @Column()
     password!: string;
 
+    @Column({ type: "varchar", unique: true, nullable: true })
+    recoverPassword!: string | null;
+
     @ManyToOne(() => Situation, (situation) => situation.users)
     @JoinColumn({ name: "situationId" })
     situation!: Situation;
@@ -25,6 +28,14 @@ export class User {
 
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP", onUpdate: "CURRENT_TIMESTAMP" })
     updatedAt!: Date;
+
+    @BeforeInsert()
+    @BeforeUpdate()
+    async hashPassword(): Promise<void> {
+        if (this.password && !/^\$2[aby]\$\d{2}\$/.test(this.password)) {
+            this.password = await bcrypt.hash(this.password, 10);
+        }
+    }
 
     async comparePassword(password: string): Promise<boolean> {
         return bcrypt.compare(password, this.password);
